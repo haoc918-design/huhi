@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ôn thi C# – Trắc nghiệm và tra đáp án</title>
+<style>
+:root{font-family:Arial,sans-serif;color:#172033;background:#f4f6fb}*{box-sizing:border-box}
+body{margin:0;padding:22px}.wrap{max-width:850px;margin:auto}.hero{background:#172554;color:white;padding:24px;border-radius:18px;margin-bottom:16px}
+h1{margin:0 0 8px}.muted{color:#68738a}.hero .muted{color:#cbd5e1}
+.tabs,.toolbar,.stats{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+button,select,input{font:inherit;border:1px solid #d6dce8;border-radius:10px;padding:11px;background:white;color:#172033}
+button{cursor:pointer}button.active{background:#dbeafe;border-color:#2563eb;color:#1d4ed8}
+.primary{background:#2563eb;color:white;border:0}.card{background:white;border:1px solid #e1e6ef;border-radius:14px;padding:17px;margin:12px 0}
+.stat{flex:1;min-width:110px}.stat b{font-size:22px;display:block}.tab{flex:1;min-width:150px}
+.option{display:block;width:100%;text-align:left;margin:8px 0}.option.chosen{background:#dbeafe;border-color:#2563eb}
+.good{color:#15803d}.bad{color:#b91c1c}.hidden{display:none!important}
+.progress{height:8px;background:#e5e7eb;border-radius:8px;margin:12px 0}.bar{height:8px;background:#2563eb;border-radius:8px}
+details summary{cursor:pointer;font-weight:600}.small{font-size:13px}
+@media(max-width:550px){body{padding:12px}.hero{padding:18px}}
+</style></head>
+<body><main class="wrap">
+<header class="hero"><h1>Ôn thi C# – Final Exam</h1><div class="muted">Đủ 50 câu trắc nghiệm · Báo đúng/sai ngay khi chọn · Tra cứu đáp án</div></header>
+<div class="stats">
+<div class="card stat"><b id="total">50</b><span class="muted">Tổng câu</span></div>
+<div class="card stat"><b id="known">50</b><span class="muted">Có đáp án</span></div>
+<div class="card stat"><b id="mistakes">0</b><span class="muted">Câu sai</span></div>
+</div>
+<nav class="tabs"><button class="tab active" id="quizTab">📝 Thi trắc nghiệm</button><button class="tab" id="lookupTab">🔎 Tra đáp án</button></nav>
+<section id="quiz">
+<div class="card toolbar"><label>Số câu luyện: <select id="count"><option>10</option><option>20</option><option selected>50</option></select></label><button class="primary" id="start">Bắt đầu thi</button></div>
+<div class="card" id="question"><span class="muted">Chọn số câu rồi nhấn Bắt đầu thi.</span></div>
+</section>
+<section id="lookup" class="hidden">
+<div class="card"><input id="query" style="width:100%" placeholder="Tìm theo số câu hoặc từ khóa, ví dụ: catch, ListBox, kế thừa"><p></p><select id="filter"><option value="all">Tất cả câu hỏi</option><option value="known">Có đáp án</option><option value="missing">Thiếu dữ liệu gốc</option></select></div>
+<div id="results"></div>
+</section>
+<p class="muted small">Bộ đề gồm 50 câu hoàn chỉnh để luyện tập. Khi chọn đáp án, website báo đúng/sai và cập nhật điểm ngay lập tức.</p>
+</main>
+<script>
+const Q=[
+[1,'Từ khóa catch dùng để làm gì?','Bắt và xử lý ngoại lệ (exception).','catch đi sau try để xử lý lỗi phát sinh trong khối try.',['Khai báo lớp','Bắt và xử lý ngoại lệ','Tạo vòng lặp','Kết thúc chương trình'],1],
+[2,'C# có hỗ trợ một lớp kế thừa trực tiếp từ nhiều lớp không?','Không. Một lớp chỉ kế thừa trực tiếp từ một lớp; có thể triển khai nhiều interface.','C# không hỗ trợ đa kế thừa lớp, nhưng cho phép triển khai nhiều interface.',['Có, không giới hạn','Có, tối đa hai lớp','Không, chỉ một lớp cha','Không được kế thừa'],2],
+[3,'Phạm vi truy cập mặc định của thành viên trong class là gì?','private','Thành viên class không ghi access modifier thì mặc định là private.',['public','private','protected','internal'],1],
+[4,'Muốn chuyển dữ liệu sang kiểu uint có thể dùng hàm nào?','Convert.ToUInt32()','ToUInt32 chuyển giá trị sang số nguyên không dấu 32-bit.',['Convert.ToInt32()','Convert.ToUInt32()','Convert.ToDouble()','Convert.ToString()'],1],
+[5,'Từ nào sau đây là từ khóa của C#?','class, int, if, else, static đều là từ khóa.','Từ khóa có ý nghĩa đặc biệt trong ngôn ngữ.',['class','int','if','Cả A, B, C'],3],
+[6,'.NET Framework gồm những thành phần nền tảng nào?','CLR và thư viện lớp Framework.','CLR thực thi chương trình; thư viện lớp cung cấp các chức năng có sẵn.',['CLR và thư viện lớp','Chỉ Visual Studio','Chỉ C# compiler','Chỉ Windows Forms'],0],
+[7,'Phương thức xóa phần tử trong List theo giá trị là gì?','Remove()','Remove(value) xóa phần tử khớp giá trị; RemoveAt(index) xóa theo vị trí.',['Delete()','Remove()','ClearOne()','Erase()'],1],
+[8,'Trong cấu trúc try-catch-finally, khối finally thường dùng để làm gì?','Thực hiện công việc dọn dẹp dù có xảy ra ngoại lệ hay không.','finally thường chạy sau try/catch, thích hợp để đóng tài nguyên hoặc giải phóng tài nguyên.',['Bắt ngoại lệ','Chỉ chạy khi có lỗi','Luôn thực hiện công việc dọn dẹp sau try/catch','Kết thúc vòng lặp'],2],
+[9,'Muốn không cho người dùng sửa nội dung TextBox thì đặt thuộc tính nào?','ReadOnly = true','ReadOnly ngăn người dùng chỉnh sửa nhưng vẫn cho phép chọn và sao chép văn bản.',['Enabled = false','ReadOnly = true','Visible = false','Multiline = true'],1],
+[10,'Lệnh Console.WriteLine() có tác dụng gì?','In nội dung ra màn hình console và xuống dòng.','WriteLine ghi dữ liệu rồi kết thúc dòng.',['Nhập dữ liệu','In ra console và xuống dòng','Xóa màn hình','Đóng chương trình'],1],
+[11,'Hàm loại bỏ khoảng trắng ở đầu và cuối chuỗi là gì?','Trim()','Trim loại bỏ khoảng trắng ở hai đầu chuỗi, không xóa khoảng trắng nằm giữa.',['Split()','Trim()','Replace()','Substring()'],1],
+[12,'Muốn chuyển chuỗi số sang int có thể dùng cách nào?','Convert.ToInt32() hoặc int.Parse()','Hai cách thường dùng để chuyển chuỗi hợp lệ thành số nguyên.',['Convert.ToInt32()','ToString()','Trim()','Concat()'],0],
+[13,'Kiểu dynamic được kiểm tra kiểu dữ liệu chủ yếu vào lúc nào?','Thời điểm chạy (runtime).','Việc phân giải thành viên được trì hoãn đến runtime.',['Lúc khai báo','Lúc chạy','Lúc thiết kế giao diện','Không bao giờ'],1],
+[14,'Từ khóa nào dùng để nạp chồng phương thức (method overloading)?','Khai báo nhiều phương thức cùng tên nhưng khác danh sách tham số.','Overloading được phân biệt bằng số lượng, kiểu hoặc thứ tự tham số; không chỉ dựa vào kiểu trả về.',['override','Khai báo cùng tên, khác danh sách tham số','virtual','base'],1],
+[15,'Trong property C#, get dùng để làm gì?','Đọc và trả về giá trị của property.','get là accessor dùng khi lấy giá trị; set dùng khi gán giá trị mới.',['Gán giá trị','Xóa property','Đọc và trả về giá trị','Tạo đối tượng'],2],
+[16,'Indexer trong C# thường cho phép truy cập đối tượng bằng cách nào?','Dùng cú pháp giống truy cập phần tử mảng, ví dụ doiTuong[0].','Indexer định nghĩa cách truy cập đối tượng bằng chỉ số trong dấu ngoặc vuông.',['doiTuong(0)','doiTuong[0]','doiTuong{0}','doiTuong->0'],1],
+[17,'Thuộc tính nào lấy hoặc gán nội dung văn bản của TextBox?','Text','Text chứa nội dung văn bản hiện tại của điều khiển.',['Name','Text','Value','Caption'],1],
+[18,'Từ khóa dùng để khai báo phương thức trừu tượng là gì?','abstract','Phương thức abstract chỉ khai báo mà chưa có phần thân triển khai thông thường.',['virtual','override','abstract','static'],2],
+[19,'Trong property, set thường sử dụng từ khóa ngầm định nào để nhận giá trị được gán?','value','Trong accessor set, từ khóa value đại diện cho giá trị mà bên ngoài đang gán vào property.',['this','base','value','return'],2],
+[20,'Trong C#, property có thể được khai báo trong những kiểu nào?','class, struct và interface.','Class và struct có thể triển khai property; interface có thể khai báo hợp đồng property.',['class','struct','interface','Cả ba'],3],
+[21,'Thành phần chịu trách nhiệm thực thi mã .NET là gì?','CLR (Common Language Runtime).','CLR quản lý việc thực thi mã .NET và nhiều dịch vụ runtime.',['IDE','CLR','HTML','SQL'],1],
+[22,'Phương thức không có phần thân và lớp con phải triển khai thường được khai báo bằng từ khóa nào?','abstract','Phương thức abstract được khai báo trong lớp abstract và được lớp con triển khai bằng override.',['private','sealed','abstract','const'],2],
+[23,'Từ khóa nào khai báo thành viên thuộc về lớp thay vì từng đối tượng?','static','Thành viên static được truy cập thông qua tên lớp.',['this','base','static','new'],2],
+[24,'CLR là viết tắt của cụm từ nào?','Common Language Runtime.','Đây là môi trường thực thi mã của nền tảng .NET.',['Common Language Runtime','Class Language Reader','Code Link Runtime','Common Library Resource'],0],
+[25,'Trong ListBox, tập hợp các mục hiển thị được truy cập qua thuộc tính nào?','Items','Items chứa danh sách các mục của ListBox.',['Text','SelectedIndex','Items','Value'],2],
+[26,'Thuộc tính nào thiết lập biểu mẫu cha cho biểu mẫu con trong MDI?','MdiParent','MdiParent liên kết form con với form cha MDI.',['ParentForm','MdiParent','OwnerName','MainForm'],1],
+[27,'Phím tắt Format Selection trong Visual Studio thường là gì?','Ctrl+K, sau đó Ctrl+F.','Đây là tổ hợp mặc định thường dùng để định dạng vùng code đã chọn.',['Ctrl+K, Ctrl+F','Ctrl+K, Ctrl+C','Ctrl+F','Alt+F4'],0],
+[28,'Từ khóa nào dùng để ghi đè phương thức ảo hoặc trừu tượng của lớp cha?','override','Lớp con dùng override để cung cấp cách triển khai mới.',['overload','override','virtual','base'],1],
+[29,'Kiểu dữ liệu nào đại diện cho tham chiếu đến phương thức?','delegate','Delegate là kiểu dùng để tham chiếu đến phương thức có chữ ký phù hợp.',['class','delegate','interface','event'],1],
+[30,'Phím tắt Uncomment Selection trong Visual Studio thường là gì?','Ctrl+K, sau đó Ctrl+U.','Tổ hợp này bỏ comment cho vùng code đang chọn.',['Ctrl+K, Ctrl+C','Ctrl+K, Ctrl+U','Ctrl+U','Ctrl+D'],1],
+[31,'Cấu trúc nào thường dùng để xử lý ngoại lệ?','try-catch','Đặt đoạn code có thể phát sinh lỗi trong try và xử lý lỗi trong catch.',['if-else','for-next','try-catch','switch-case'],2],
+[32,'Constructor trong C# có đặc điểm nào?','Có tên trùng với tên lớp và không khai báo kiểu trả về.','Constructor được gọi khi tạo đối tượng; tên phải trùng tên lớp và không có kiểu trả về, kể cả void.',['Có kiểu trả về void','Tên trùng tên lớp và không có kiểu trả về','Tên luôn là Main','Chỉ được có một constructor'],1],
+[33,'Cách viết comment một dòng trong C# là gì?','//','Hai dấu gạch chéo bắt đầu comment một dòng; /* ... */ dùng cho comment nhiều dòng.',['//','<!-- -->','#','**'],0],
+[34,'Biến được khai báo bên trong một phương thức thường được gọi là gì?','Biến cục bộ (local variable).','Biến cục bộ chỉ có phạm vi sử dụng trong khối lệnh nơi nó được khai báo.',['Biến toàn cục','Biến cục bộ','Biến static','Property'],1],
+[35,'Trong ListBox, thuộc tính nào trả về mục đang được chọn?','SelectedItem','SelectedItem trả về mục đang chọn; SelectedIndex trả về chỉ số.',['Items','SelectedIndex','SelectedItem','SelectedValue'],2],
+[36,'Từ khóa static áp dụng cho một phương thức có ý nghĩa gì?','Có thể gọi phương thức thông qua tên lớp mà không cần tạo đối tượng.','Phương thức static thuộc về kiểu/lớp, không gắn với một đối tượng cụ thể.',['Chỉ gọi được trong constructor','Phải tạo đối tượng mới gọi được','Gọi thông qua tên lớp','Phương thức tự chạy lặp lại'],2],
+[37,'List<T>.RemoveAt(1) thực hiện thao tác nào?','Xóa phần tử tại vị trí có chỉ số 1 (phần tử thứ hai).','Chỉ số của List bắt đầu từ 0, vì vậy index 1 là phần tử thứ hai.',['Xóa phần tử có giá trị bằng 1','Xóa phần tử thứ hai','Xóa toàn bộ danh sách','Xóa phần tử cuối'],1],
+[38,'Trong ListBox, SelectedIndex trả về thông tin gì?','Chỉ số của mục đang được chọn.','SelectedIndex trả về vị trí của mục được chọn; thường là -1 nếu chưa chọn mục nào.',['Nội dung tất cả mục','Chỉ số mục đang chọn','Số lượng mục','Tên của ListBox'],1],
+[39,'Giá trị nào sau đây có thể lưu trong biến kiểu uint?','Số nguyên không âm trong phạm vi của uint.','uint là số nguyên 32-bit không dấu, không lưu số âm.',['-5','3.14','25','Hello'],2],
+[40,'Một lớp có chứa ít nhất một phương thức abstract thì phải được khai báo như thế nào?','Là lớp abstract.','Lớp chứa phương thức abstract phải là abstract; lớp con cụ thể phải triển khai các phương thức abstract còn thiếu.',['static','sealed','abstract','partial'],2],
+[41,'Một class triển khai interface nhưng chưa cài đặt đầy đủ các thành viên bắt buộc thì phải làm gì?','Khai báo class đó là abstract hoặc triển khai đầy đủ các thành viên.','Một lớp không trừu tượng phải triển khai các thành viên interface; nếu chưa làm được thì có thể khai báo abstract.',['Bỏ dấu hai chấm','Khai báo abstract hoặc triển khai đủ','Đổi interface thành namespace','Không cần xử lý'],1],
+[42,'Từ khóa base trong lớp con thường được dùng để làm gì?','Truy cập thành viên hoặc gọi constructor của lớp cha.','base giúp lớp con gọi constructor lớp cha hoặc truy cập thành viên phù hợp của lớp cha.',['Tạo lớp mới','Gọi thành viên/constructor lớp cha','Xóa đối tượng cha','Kết thúc chương trình'],1],
+[43,'Một class muốn sử dụng interface thì khai báo như thế nào?','Khai báo tên interface sau dấu hai chấm và triển khai các thành viên bắt buộc.','Ví dụ: class A : ITest { ... }',['Dùng dấu phẩy','Dùng dấu hai chấm :','Dùng từ khóa extends','Dùng từ khóa import'],1],
+[44,'Tất cả các class trong C# cuối cùng đều kế thừa từ lớp nào?','System.Object','Nếu không chỉ định lớp cha khác, class mặc định kế thừa Object.',['System.ValueType','System.Object','System.String','System.Class'],1],
+[45,'Composition trong lập trình hướng đối tượng thể hiện quan hệ nào?','HAS-A (có một/thành phần).','Một đối tượng chứa hoặc sở hữu đối tượng khác như một thành phần.',['IS-A','HAS-A','CAN-DO','USES-ONLY'],1],
+[46,'Đa hình runtime thường xuất hiện khi lớp con làm gì với phương thức lớp cha?','Override phương thức virtual hoặc abstract.','Khi gọi qua tham chiếu kiểu lớp cha, phiên bản override của đối tượng thực tế có thể được gọi.',['Ẩn mọi biến','Override phương thức phù hợp','Đổi tên lớp cha','Xóa constructor'],1],
+[47,'Khai báo mảng hai chiều gồm 2 hàng và 3 cột trong C# viết thế nào?','int[,] a = new int[2, 3];','Dấu phẩy trong kiểu int[,] thể hiện mảng hai chiều; [2, 3] là 2 hàng và 3 cột.',['int[] a = new int[2, 3];','int[,] a = new int[2, 3];','int a = new int[2][3];','int[][] a = new int[2, 3];'],1],
+[48,'Delegate trong C# có thể dùng để làm gì?','Lưu tham chiếu đến phương thức có chữ ký phù hợp và gọi phương thức đó.','Delegate là kiểu an toàn kiểu dùng để tham chiếu đến một hoặc nhiều phương thức tương thích.',['Lưu hình ảnh','Tham chiếu và gọi phương thức','Tạo vòng lặp','Khai báo namespace'],1],
+[49,'Với class B : A và constructor B(int i) : base(i), lớp A cần điều kiện gì?','Lớp A phải có constructor nhận một int và constructor đó phải truy cập được từ B.','base(i) gọi constructor lớp cha có tham số int.',['A phải có constructor public không tham số','A phải có constructor nhận int truy cập được','A không được có constructor','B không thể gọi constructor cha'],1],
+[50,'Khi muốn ném một ngoại lệ trong C#, dùng từ khóa nào?','throw','throw dùng để ném ngoại lệ; throws không phải từ khóa khai báo phương thức trong C#.',['catch','throws','throw','finally'],2]
+];
+const $=id=>document.getElementById(id), esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let exam=[],pos=0,answers={},submitted=false,wrong=new Set();
+function tab(which){$('quiz').classList.toggle('hidden',which!=='quiz');$('lookup').classList.toggle('hidden',which!=='lookup');$('quizTab').classList.toggle('active',which==='quiz');$('lookupTab').classList.toggle('active',which==='lookup')}
+$('quizTab').onclick=()=>tab('quiz');$('lookupTab').onclick=()=>tab('lookup');
+function stats(){
+  $('total').textContent=Q.length;
+  $('known').textContent=Q.filter(q=>Array.isArray(q[4]) && q[4].length===4).length;
+  $('mistakes').textContent=wrong.size;
+}
+function currentScore(){return exam.filter(q=>answers[q[0]]===q[5]).length}
+function start(){
+  let n=+$('count').value;
+  exam=Q.slice().sort(()=>Math.random()-.5).slice(0,n);
+  pos=0;answers={};submitted=false;wrong=new Set();stats();render();
+}
+function render(){
+  let q=exam[pos], chosen=answers[q[0]], hasAnswered=chosen!==undefined;
+  let h=`<div class="stats"><div><b>Điểm hiện tại: ${currentScore()}/${Object.keys(answers).length}</b></div><div class="muted">Đã trả lời ${Object.keys(answers).length}/${exam.length} câu</div></div>`;
+  h+=`<div class="muted">Câu ${pos+1}/${exam.length}</div><div class="progress"><div class="bar" style="width:${(pos+1)/exam.length*100}%"></div></div><h3>Câu ${q[0]}. ${esc(q[1])}</h3>`;
+  q[4].forEach((v,i)=>{
+    let cls='';
+    if(hasAnswered && i===q[5]) cls='good';
+    else if(hasAnswered && i===chosen && chosen!==q[5]) cls='bad';
+    h+=`<button class="option ${chosen===i?'chosen':''}" data-i="${i}" ${hasAnswered?'disabled':''}><b>${'ABCD'[i]}.</b> ${esc(v)}</button>`;
+  });
+  if(hasAnswered){
+    let ok=chosen===q[5];
+    h+=`<div class="card"><b class="${ok?'good':'bad'}">${ok?'✓ Chính xác!':'✗ Chưa đúng.'} Đáp án đúng: ${'ABCD'[q[5]]}</b><p>${esc(q[2])}</p><p class="muted">${esc(q[3])}</p></div>`;
+  } else {
+    h+=`<p class="muted small">Chọn một đáp án để xem kết quả ngay lập tức.</p>`;
+  }
+  h+=`<div class="toolbar"><button id="prev" ${pos===0?'disabled':''}>← Trước</button><button id="next" class="primary" ${!hasAnswered?'disabled':''}>${pos===exam.length-1?'Xem kết quả':'Câu tiếp theo →'}</button></div>`;
+  $('question').innerHTML=h;
+  document.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{
+    if(answers[q[0]]===undefined){
+      answers[q[0]]=+b.dataset.i;
+      if(answers[q[0]]!==q[5]) wrong.add(q[0]);
+      stats();render();
+    }
+  });
+  $('prev').onclick=()=>{if(pos>0){pos--;render()}};
+  $('next').onclick=()=>{if(pos<exam.length-1){pos++;render()}else result()};
+}
+function result(){
+  let score=currentScore(), attempted=Object.keys(answers).length;
+  $('question').innerHTML=`<div style="text-align:center;padding:20px"><div class="muted">KẾT QUẢ BÀI THI</div><h1>${score}/${exam.length}</h1><p>Đúng ${score} câu · Sai ${attempted-score} câu · Chưa làm ${exam.length-attempted} câu</p><p>${score/exam.length>=.8?'Rất tốt!':score/exam.length>=.5?'Cố gắng thêm nhé!':'Hãy ôn lại kiến thức nhé!'}</p><button id="review">Xem lại từng câu</button> <button id="again" class="primary">Thi lại</button></div>`;
+  $('review').onclick=()=>{pos=0;render()};
+  $('again').onclick=start;
+}
+function lookup(){let term=$('query').value.trim().toLocaleLowerCase('vi'),filter=$('filter').value;let found=Q.filter(q=>{let known=!!q[4];if(filter==='known'&&!known||filter==='missing'&&known)return false;return !term||(q.join(' ').toLocaleLowerCase('vi').includes(term))});$('results').innerHTML=found.length?found.map(q=>`<details class="card"><summary>Câu ${q[0]}. ${esc(q[1])}<div class="muted small">${q[4]?'Có đáp án':'Chưa có đáp án'}</div></summary><p><b>${esc(q[2])}</b></p><p class="muted">${esc(q[3])}</p>${q[4]?`<p>Đáp án lựa chọn: <b>${'ABCD'[q[5]]}</b></p>`:''}</details>`).join(''):'<div class="card">Không tìm thấy câu phù hợp.</div>'}
+$('start').onclick=start;$('query').oninput=lookup;$('filter').onchange=lookup;lookup();stats();
+</script></body></html>
